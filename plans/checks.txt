@@ -3,4 +3,5 @@ checks:
 - I rejected using websocket api for now and instead I use rss feeds because it is simpler solution for a prototype like this. But implementing a websocket client is also easy because the data source is generalised
 - It wanted to allow users to set their slack channel, but I interpret it as It need a global slack channel to every category ("we can add more channels later")
 - there were some UX errors and bugs I noticed, so I asked it to fix it
-- I ask some clarification questions 
+- I ask some clarification questions about the collecting and send the news. It wanted to send every piece of news in a separate message, I ask it to collect messages for 15 minutes
+- I asked the test the workflow of news collecting and send it via email

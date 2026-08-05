@@ -33,3 +33,7 @@
 "please look for mistakes or potential errors in the code"
 "okay make it so!"
 "please collect every prompt I wrote for you in the session" 
+"how often send the news via email and to slack channel?"
+"One mail per news item is too often. Let's wait 15 minutes between email/users. Make a plan how would you implement it"
+"yes, implement it please"
+"okay test it please"
