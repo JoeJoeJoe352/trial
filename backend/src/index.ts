@@ -8,6 +8,7 @@ import subscriptionsRoutes from './me/subscriptions.routes';
 import newsRoutes from './news/routes';
 import { startScheduler } from './ingestion/scheduler';
 import { startMatcher } from './matching/matcher';
+import { startEmailDigestScheduler } from './notifications/email-digest';
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -37,6 +38,7 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 startMatcher();
+startEmailDigestScheduler();
 
 app.listen(port, () => {
   console.log(`Backend listening on port ${port}`);

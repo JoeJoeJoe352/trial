@@ -1,4 +1,4 @@
-import { Category, Channel, DeliveryStatus, News, Prisma } from '@prisma/client';
+import { Category, DeliveryStatus, News, Prisma } from '@prisma/client';
 import { prisma } from '../db';
 import { notificationChannels } from './registry';
 
@@ -8,60 +8,55 @@ interface SubscribedUser {
   email: string;
 }
 
-/** Fans a news item out to the category's Slack webhook (if set) and every subscribed user's email, recording each attempt. */
+/** Fans a news item out to the category's Slack webhook (if set, immediately) and queues an email delivery for every subscribed user. */
 export async function dispatchNewsToChannels(news: News, category: Category, users: SubscribedUser[]): Promise<void> {
   if (category.slackWebhookUrl) {
-    await sendAndRecord({
-      news,
-      channel: 'SLACK',
-      categoryId: category.id,
-      destination: category.slackWebhookUrl,
-      categoryName: category.name,
-    });
+    await sendSlackAndRecord(news, category);
   }
 
   for (const user of users) {
-    await sendAndRecord({
-      news,
-      channel: 'EMAIL',
-      userId: user.id,
-      destination: user.email,
-      categoryName: category.name,
-    });
+    await enqueueEmail(news, user.id);
   }
 }
 
-/** Sends one notification via the appropriate channel and records the attempt in `Delivery`, deduping on (news, channel, target). */
-async function sendAndRecord(opts: {
-  news: News;
-  channel: Channel;
-  destination: string;
-  categoryName: string;
-  userId?: string;
-  categoryId?: string;
-}): Promise<void> {
+/** Records a PENDING email delivery; the digest flusher (see `email-digest.ts`) sends it once the user's cooldown has elapsed. Deduped on (news, channel, user). */
+async function enqueueEmail(news: News, userId: string): Promise<void> {
+  try {
+    await prisma.delivery.create({
+      data: { newsId: news.id, channel: 'EMAIL', userId },
+    });
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      // Already queued or sent for this (news, user) pair — nothing more to do.
+      return;
+    }
+    throw err;
+  }
+}
+
+/** Sends the news item to the category's Slack webhook immediately and records the attempt in `Delivery`, deduping on (news, category). */
+async function sendSlackAndRecord(news: News, category: Category): Promise<void> {
   let status: DeliveryStatus = 'SENT';
   let error: string | undefined;
 
   try {
-    await notificationChannels[opts.channel].send({
-      news: opts.news,
-      destination: opts.destination,
-      categoryName: opts.categoryName,
+    await notificationChannels.SLACK.send({
+      news,
+      destination: category.slackWebhookUrl!,
+      categoryName: category.name,
     });
   } catch (err) {
     status = 'FAILED';
     error = err instanceof Error ? err.message : String(err);
-    console.error(`Failed to send ${opts.channel} notification for news ${opts.news.id}:`, error);
+    console.error(`Failed to send SLACK notification for news ${news.id}:`, error);
   }
 
   try {
     await prisma.delivery.create({
       data: {
-        newsId: opts.news.id,
-        channel: opts.channel,
-        userId: opts.userId,
-        categoryId: opts.categoryId,
+        newsId: news.id,
+        channel: 'SLACK',
+        categoryId: category.id,
         status,
         error,
         sentAt: status === 'SENT' ? new Date() : null,
@@ -69,13 +64,9 @@ async function sendAndRecord(opts: {
     });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      // Already recorded for this (news, channel, target) — nothing more to do.
+      // Already recorded for this (news, category) pair — nothing more to do.
       return;
     }
     throw err;
-  }
-
-  if (opts.channel === 'EMAIL' && status === 'SENT' && opts.userId) {
-    await prisma.user.update({ where: { id: opts.userId }, data: { lastEmailSentAt: new Date() } });
   }
 }
