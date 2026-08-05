@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../db';
-import { signToken } from './jwt';
+import { verifyToken } from './jwt';
+import { createSession, revokeSession } from './session';
 import { AUTH_COOKIE_NAME, authCookieOptions } from './cookie';
 import { requireAuth } from './middleware';
 import { toPublicUser } from './public-user';
@@ -32,7 +33,7 @@ router.post('/register', async (req, res) => {
     data: { email, name, passwordHash },
   });
 
-  const token = signToken({ sub: user.id, role: user.role });
+  const token = await createSession(user.id, user.role);
   res.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
   res.status(201).json(toPublicUser(user));
 });
@@ -46,19 +47,29 @@ router.post('/login', async (req, res) => {
     return;
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findFirst({ where: { email, deletedAt: null } });
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     res.status(401).json({ error: 'Invalid email or password' });
     return;
   }
 
-  const token = signToken({ sub: user.id, role: user.role });
+  const token = await createSession(user.id, user.role);
   res.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
   res.json(toPublicUser(user));
 });
 
-/** POST /logout — clears the auth cookie. */
-router.post('/logout', (_req, res) => {
+/** POST /logout — revokes the server-side session (if any) so the token can no longer authenticate, then clears the cookie. */
+router.post('/logout', async (req, res) => {
+  const token = req.cookies?.[AUTH_COOKIE_NAME];
+  if (token) {
+    try {
+      const { sessionId } = verifyToken(token);
+      await revokeSession(sessionId);
+    } catch {
+      // Token was already invalid/expired — nothing server-side to revoke.
+    }
+  }
+
   res.clearCookie(AUTH_COOKIE_NAME, { ...authCookieOptions, maxAge: undefined });
   res.status(204).send();
 });
