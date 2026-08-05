@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './auth/routes';
+import { startScheduler } from './ingestion/scheduler';
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -22,4 +23,5 @@ app.get('/health', (_req, res) => {
 
 app.listen(port, () => {
   console.log(`Backend listening on port ${port}`);
+  startScheduler().catch((err) => console.error('Failed to start scheduler:', err));
 });
