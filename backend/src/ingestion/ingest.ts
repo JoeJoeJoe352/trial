@@ -15,7 +15,7 @@ export async function ingestItem(source: Source, item: NormalizedItem): Promise<
         publishedAt: item.publishedAt,
       },
     });
-    publishNewsCreated(news);
+    publishNewsCreated(news, source.categoryId);
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
       // Already ingested (sourceId, externalId) pair — not an error, just a repeat poll.

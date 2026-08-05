@@ -6,6 +6,7 @@ import adminRoutes from './admin';
 import categoriesRoutes from './categories/routes';
 import subscriptionsRoutes from './me/subscriptions.routes';
 import { startScheduler } from './ingestion/scheduler';
+import { startMatcher } from './matching/matcher';
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -31,6 +32,8 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   res.status(500).json({ error: 'Internal server error' });
 });
+
+startMatcher();
 
 app.listen(port, () => {
   console.log(`Backend listening on port ${port}`);
