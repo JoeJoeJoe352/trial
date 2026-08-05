@@ -1,0 +1,6 @@
+checks:
+- Tried to work as agile as I could so I asked to break the plan to steps and I checked the work after every "sprint"
+- I rejected using websocket api for now and instead I use rss feeds because it is simpler solution for a prototype like this. But implementing a websocket client is also easy because the data source is generalised
+- It wanted to allow users to set their slack channel, but I interpret it as It need a global slack channel to every category ("we can add more channels later")
+- there were some UX errors and bugs I noticed, so I asked it to fix it
+- I ask some clarification questions 

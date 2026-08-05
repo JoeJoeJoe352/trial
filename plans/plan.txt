@@ -1,0 +1,32 @@
+Phase 0 — Foundation
+1, Add PostgreSQL to docker-compose.yml; add Prisma to backend/
+2, Write the Prisma schema (categories, sources, news, users, subscriptions, deliveries) + run the initial migration
+
+Phase 1 — Auth
+3. JWT auth: password hashing (bcrypt), login endpoint, role-based middleware (admin vs user)
+
+Phase 2 — Admin CRUD
+4. Categories CRUD (includes slack_webhook_url)
+5. Sources CRUD
+6. Users CRUD
+
+Phase 3 — Ingestion
+7. SourceAdapter interface + RssAdapter implementation
+8. Scheduler that polls active RSS sources on their configured interval
+9. Ingestion normalizer: dedupe by external_id, persist to news, publish to the internal event bus
+
+Phase 4 — Matching + Notification
+10. Matching engine: on new news item, find active subscriptions for its category
+11. NotificationChannel interface + EmailChannel + SlackChannel
+12. Dispatch service: email each subscribed user, broadcast to the category's Slack webhook if set, write deliveries (dedup guard)
+
+Phase 5 — User-facing API
+13. Login, list categories, manage own subscriptions
+
+Phase 6 — Frontend (Angular)
+14. Auth screens + JWT interceptor
+15. Admin views: categories/sources/users CRUD tables+forms
+16. User view: browse categories, subscribe/unsubscribe
+
+Phase 7 — Verification
+17. End-to-end check via docker compose up
