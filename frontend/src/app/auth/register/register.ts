@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
@@ -21,8 +21,8 @@ export class Register {
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
-  protected errorMessage = '';
-  protected submitting = false;
+  protected readonly errorMessage = signal('');
+  protected readonly submitting = signal(false);
 
   submit(): void {
     if (this.form.invalid) {
@@ -30,19 +30,20 @@ export class Register {
       return;
     }
 
-    this.errorMessage = '';
-    this.submitting = true;
+    this.errorMessage.set('');
+    this.submitting.set(true);
     const { name, email, password } = this.form.getRawValue();
 
     this.auth.register(email, name, password).subscribe({
       next: () => {
-        this.submitting = false;
+        this.submitting.set(false);
         this.router.navigateByUrl('/');
       },
       error: (err: HttpErrorResponse) => {
-        this.submitting = false;
-        this.errorMessage =
-          err.status === 409 ? 'An account with this email already exists' : (err.error?.error ?? 'Something went wrong');
+        this.submitting.set(false);
+        this.errorMessage.set(
+          err.status === 409 ? 'An account with this email already exists' : (err.error?.error ?? 'Something went wrong'),
+        );
       },
     });
   }

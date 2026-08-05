@@ -26,11 +26,11 @@
       <span class="field-error">Password must be at least 8 characters</span>
     }
 
-    @if (errorMessage) {
-      <p class="error">{{ errorMessage }}</p>
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
     }
 
-    <button type="submit" [disabled]="submitting">{{ submitting ? 'Registering...' : 'Register' }}</button>
+    <button type="submit" [disabled]="submitting()">{{ submitting() ? 'Registering...' : 'Register' }}</button>
 
     <p>Already have an account? <a routerLink="/login">Log in</a></p>
   </form>

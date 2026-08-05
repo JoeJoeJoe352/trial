@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
@@ -20,8 +20,8 @@ export class Login {
     password: ['', [Validators.required]],
   });
 
-  protected errorMessage = '';
-  protected submitting = false;
+  protected readonly errorMessage = signal('');
+  protected readonly submitting = signal(false);
 
   submit(): void {
     if (this.form.invalid) {
@@ -29,18 +29,20 @@ export class Login {
       return;
     }
 
-    this.errorMessage = '';
-    this.submitting = true;
+    this.errorMessage.set('');
+    this.submitting.set(true);
     const { email, password } = this.form.getRawValue();
 
     this.auth.login(email, password).subscribe({
       next: () => {
-        this.submitting = false;
+        this.submitting.set(false);
         this.router.navigateByUrl('/');
+        console.log("11111")
       },
       error: (err: HttpErrorResponse) => {
-        this.submitting = false;
-        this.errorMessage = err.status === 401 ? 'Invalid email or password' : 'Something went wrong';
+        console.log("22222")
+        this.submitting.set(false);
+        this.errorMessage.set(err.status === 401 ? 'Invalid email or password' : 'Something went wrong');
       },
     });
   }

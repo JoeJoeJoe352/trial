@@ -18,11 +18,11 @@
       <span class="field-error">Password is required</span>
     }
 
-    @if (errorMessage) {
-      <p class="error">{{ errorMessage }}</p>
+    @if (errorMessage()) {
+      <p class="error">{{ errorMessage() }}</p>
     }
 
-    <button type="submit" [disabled]="submitting">{{ submitting ? 'Logging in...' : 'Log in' }}</button>
+    <button type="submit" [disabled]="submitting()">{{ submitting() ? 'Logging in...' : 'Log in' }}</button>
 
     <p>No account? <a routerLink="/register">Register</a></p>
   </form>
