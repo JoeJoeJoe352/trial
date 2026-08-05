@@ -21,6 +21,7 @@ services:
     environment:
       DATABASE_URL: postgresql://news_alerts:news_alerts@db:5432/news_alerts?schema=public
       PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
     expose:
       - "3000"
     depends_on:

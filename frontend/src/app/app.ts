@@ -1,20 +1,18 @@
-import { Component, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { Header } from './header/header';
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [RouterOutlet, Header],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  private readonly http = inject(HttpClient);
-  protected readonly message = signal('Loading...');
+  private readonly auth = inject(AuthService);
 
   constructor() {
-    this.http.get<{ message: string }>('/api/hello').subscribe({
-      next: (res) => this.message.set(res.message),
-      error: () => this.message.set('Hello World (backend unreachable)'),
-    });
+    this.auth.init();
   }
 }

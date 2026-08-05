@@ -1,0 +1,15 @@
+<header class="header">
+  <a class="brand" routerLink="/">News Alerts</a>
+
+  @if (auth.checked()) {
+    <nav class="actions">
+      @if (auth.currentUser(); as user) {
+        <span class="user-name">{{ user.name }}</span>
+        <button (click)="logout()">Log out</button>
+      } @else {
+        <a routerLink="/login">Log in</a>
+        <a class="cta" routerLink="/register">Register</a>
+      }
+    </nav>
+  }
+</header>
