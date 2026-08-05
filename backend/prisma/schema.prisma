@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum SourceType {
+  RSS
+  WEBSOCKET
+}
+
+enum Channel {
+  EMAIL
+  SLACK
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model Category {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  slackWebhookUrl String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sources       Source[]
+  subscriptions Subscription[]
+  deliveries    Delivery[]
+
+  @@map("categories")
+}
+
+model Source {
+  id                  String     @id @default(cuid())
+  name                String
+  url                 String
+  type                SourceType @default(RSS)
+  pollIntervalSeconds Int        @default(300)
+  active              Boolean    @default(true)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  news News[]
+
+  @@map("sources")
+}
+
+model News {
+  id          String   @id @default(cuid())
+  externalId  String
+  title       String
+  summary     String?
+  url         String
+  publishedAt DateTime
+  ingestedAt  DateTime @default(now())
+
+  sourceId String
+  source   Source @relation(fields: [sourceId], references: [id])
+
+  deliveries Delivery[]
+
+  @@unique([sourceId, externalId])
+  @@map("news")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String
+  passwordHash    String
+  role            Role     @default(USER)
+  lastEmailSentAt DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subscriptions Subscription[]
+  deliveries    Delivery[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId])
+  @@map("subscriptions")
+}
+
+model Delivery {
+  id        String         @id @default(cuid())
+  channel   Channel
+  status    DeliveryStatus @default(PENDING)
+  error     String?
+  sentAt    DateTime?
+  createdAt DateTime       @default(now())
+
+  newsId String
+  news   News   @relation(fields: [newsId], references: [id])
+
+  // Set for EMAIL deliveries (one per subscribed user)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  // Set for SLACK deliveries (one broadcast per category)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  @@unique([newsId, channel, userId])
+  @@unique([newsId, channel, categoryId])
+  @@map("deliveries")
+}
