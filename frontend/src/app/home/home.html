@@ -1,8 +1,42 @@
-<main class="page">
+<main class="news-page">
   @if (auth.currentUser(); as user) {
-    <h1>Welcome, {{ user.name }}</h1>
-    <p>{{ user.email }} ({{ user.role }})</p>
+    <p class="welcome">Welcome, {{ user.name }}</p>
+  }
+
+  <h1>Latest News</h1>
+
+  <div class="filters">
+    <button type="button" [class.active]="selectedCategoryId() === null" (click)="selectCategory(null)">All</button>
+    @for (category of categories(); track category.id) {
+      <button
+        type="button"
+        [class.active]="selectedCategoryId() === category.id"
+        (click)="selectCategory(category.id)"
+      >
+        {{ category.name }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <p>Loading...</p>
+  } @else if (news().length === 0) {
+    <p>No news yet.</p>
   } @else {
-    <h1>Hello World</h1>
+    <ul class="news-list">
+      @for (item of news(); track item.id) {
+        <li>
+          <a [href]="item.url" target="_blank" rel="noopener">{{ item.title }}</a>
+          <div class="meta">
+            <span class="category-tag">{{ item.source.category.name }}</span>
+            <span>{{ item.source.name }}</span>
+            <span>{{ item.publishedAt | date: 'medium' }}</span>
+          </div>
+          @if (item.summary) {
+            <p class="summary">{{ item.summary }}</p>
+          }
+        </li>
+      }
+    </ul>
   }
 </main>
