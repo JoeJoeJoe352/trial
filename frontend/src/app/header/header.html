@@ -4,6 +4,10 @@
   @if (auth.checked()) {
     <nav class="actions">
       @if (auth.currentUser(); as user) {
+        <a routerLink="/categories">Categories</a>
+        @if (user.role === 'ADMIN') {
+          <a routerLink="/admin">Admin</a>
+        }
         <span class="user-name">{{ user.name }}</span>
         <button (click)="logout()">Log out</button>
       } @else {

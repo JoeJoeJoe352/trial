@@ -1,0 +1,18 @@
+.admin-nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+  padding-bottom: 0.25rem;
+}
+
+.admin-nav a.active {
+  color: #1a73e8;
+  border-bottom: 2px solid #1a73e8;
+}

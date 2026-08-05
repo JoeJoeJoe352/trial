@@ -3,6 +3,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './auth/routes';
 import adminRoutes from './admin';
+import categoriesRoutes from './categories/routes';
+import subscriptionsRoutes from './me/subscriptions.routes';
 import { startScheduler } from './ingestion/scheduler';
 
 const app = express();
@@ -18,6 +20,8 @@ app.get('/api/hello', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/me/subscriptions', subscriptionsRoutes);
 
 app.get('/health', (_req, res) => {
   res.status(200).send('OK');

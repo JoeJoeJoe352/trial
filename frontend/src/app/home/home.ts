@@ -5,7 +5,6 @@ import { AuthService } from '../auth/auth.service';
   selector: 'app-home',
   imports: [],
   templateUrl: './home.html',
-  styleUrl: './home.css',
 })
 export class Home {
   protected readonly auth = inject(AuthService);

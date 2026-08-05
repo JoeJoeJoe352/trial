@@ -6,8 +6,7 @@ import { AuthService } from './auth/auth.service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Header],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './app.html'
 })
 export class App {
   private readonly auth = inject(AuthService);

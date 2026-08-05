@@ -1,0 +1,29 @@
+.category-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 400px;
+}
+
+.category-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.category-list button {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+  border: 1px solid #1a73e8;
+  border-radius: 4px;
+  background: white;
+  color: #1a73e8;
+  cursor: pointer;
+}
+
+.category-list button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

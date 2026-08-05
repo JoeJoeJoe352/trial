@@ -1,0 +1,64 @@
+<section class="admin-section">
+  <h2>Sources</h2>
+
+  <form class="inline-form" [formGroup]="form" (ngSubmit)="submit()">
+    <input type="text" formControlName="name" placeholder="Name" />
+    <input type="text" formControlName="url" placeholder="Feed URL" />
+
+    <select formControlName="type">
+      <option value="RSS">RSS</option>
+      <option value="WEBSOCKET">WEBSOCKET</option>
+    </select>
+
+    <select formControlName="categoryId">
+      <option value="" disabled>Category...</option>
+      @for (category of categories(); track category.id) {
+        <option [value]="category.id">{{ category.name }}</option>
+      }
+    </select>
+
+    <input type="number" formControlName="pollIntervalSeconds" placeholder="Poll interval (s)" />
+
+    <label class="checkbox">
+      <input type="checkbox" formControlName="active" />
+      Active
+    </label>
+
+    <button type="submit">{{ editingId() ? 'Save' : 'Add' }}</button>
+    @if (editingId()) {
+      <button type="button" class="secondary" (click)="cancelEdit()">Cancel</button>
+    }
+  </form>
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Type</th>
+        <th>Interval (s)</th>
+        <th>Active</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (source of sources(); track source.id) {
+        <tr>
+          <td>{{ source.name }}</td>
+          <td>{{ categoryName(source.categoryId) }}</td>
+          <td>{{ source.type }}</td>
+          <td>{{ source.pollIntervalSeconds }}</td>
+          <td>{{ source.active ? 'Yes' : 'No' }}</td>
+          <td>
+            <button type="button" (click)="startEdit(source)">Edit</button>
+            <button type="button" (click)="remove(source.id)">Delete</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>

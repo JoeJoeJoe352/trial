@@ -1,0 +1,18 @@
+<main class="page">
+  <h1>Categories</h1>
+
+  @if (loading()) {
+    <p>Loading...</p>
+  } @else {
+    <ul class="category-list">
+      @for (category of categories(); track category.id) {
+        <li>
+          <span>{{ category.name }}</span>
+          <button [disabled]="pendingIds().has(category.id)" (click)="toggle(category.id)">
+            {{ subscribedIds().has(category.id) ? 'Unsubscribe' : 'Subscribe' }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</main>
