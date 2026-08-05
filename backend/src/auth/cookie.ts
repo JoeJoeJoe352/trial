@@ -1,7 +1,9 @@
 import { CookieOptions } from 'express';
 
+/** Name of the cookie that carries the auth JWT. */
 export const AUTH_COOKIE_NAME = 'token';
 
+/** Cookie options used when setting the auth cookie on login/register. */
 export const authCookieOptions: CookieOptions = {
   httpOnly: true,
   sameSite: 'lax',

@@ -4,11 +4,13 @@ import { handlePrismaError } from '../lib/prisma-errors';
 
 const router = Router();
 
+/** GET / — lists all categories (admin view, unfiltered fields). */
 router.get('/', async (_req, res) => {
   const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } });
   res.json(categories);
 });
 
+/** GET /:id — fetches one category by id. */
 router.get('/:id', async (req, res) => {
   const category = await prisma.category.findUnique({ where: { id: req.params.id } });
   if (!category) {
@@ -18,6 +20,7 @@ router.get('/:id', async (req, res) => {
   res.json(category);
 });
 
+/** POST / — creates a category. */
 router.post('/', async (req, res) => {
   const { name, slug, slackWebhookUrl } = req.body ?? {};
 
@@ -37,6 +40,7 @@ router.post('/', async (req, res) => {
   }
 });
 
+/** PATCH /:id — partially updates a category. */
 router.patch('/:id', async (req, res) => {
   const { name, slug, slackWebhookUrl } = req.body ?? {};
 
@@ -54,6 +58,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+/** DELETE /:id — deletes a category, refusing if any source still references it. */
 router.delete('/:id', async (req, res) => {
   const sourceCount = await prisma.source.count({ where: { categoryId: req.params.id } });
   if (sourceCount > 0) {

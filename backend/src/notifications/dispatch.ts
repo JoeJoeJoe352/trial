@@ -2,11 +2,13 @@ import { Category, Channel, DeliveryStatus, News, Prisma } from '@prisma/client'
 import { prisma } from '../db';
 import { notificationChannels } from './registry';
 
+/** Minimal user shape needed to send a notification. */
 interface SubscribedUser {
   id: string;
   email: string;
 }
 
+/** Fans a news item out to the category's Slack webhook (if set) and every subscribed user's email, recording each attempt. */
 export async function dispatchNewsToChannels(news: News, category: Category, users: SubscribedUser[]): Promise<void> {
   if (category.slackWebhookUrl) {
     await sendAndRecord({
@@ -29,6 +31,7 @@ export async function dispatchNewsToChannels(news: News, category: Category, use
   }
 }
 
+/** Sends one notification via the appropriate channel and records the attempt in `Delivery`, deduping on (news, channel, target). */
 async function sendAndRecord(opts: {
   news: News;
   channel: Channel;

@@ -7,6 +7,7 @@ import { schedulePolling, unschedulePolling } from '../ingestion/scheduler';
 const router = Router();
 const VALID_TYPES: SourceType[] = ['RSS', 'WEBSOCKET'];
 
+/** GET / — lists all sources with their category. */
 router.get('/', async (_req, res) => {
   const sources = await prisma.source.findMany({
     orderBy: { name: 'asc' },
@@ -15,6 +16,7 @@ router.get('/', async (_req, res) => {
   res.json(sources);
 });
 
+/** GET /:id — fetches one source by id. */
 router.get('/:id', async (req, res) => {
   const source = await prisma.source.findUnique({ where: { id: req.params.id } });
   if (!source) {
@@ -24,6 +26,7 @@ router.get('/:id', async (req, res) => {
   res.json(source);
 });
 
+/** POST / — creates a source and (re)schedules its polling. */
 router.post('/', async (req, res) => {
   const { name, url, type, categoryId, pollIntervalSeconds, active } = req.body ?? {};
 
@@ -55,6 +58,7 @@ router.post('/', async (req, res) => {
   }
 });
 
+/** PATCH /:id — partially updates a source and re-applies its polling schedule. */
 router.patch('/:id', async (req, res) => {
   const { name, url, type, categoryId, pollIntervalSeconds, active } = req.body ?? {};
 
@@ -81,6 +85,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+/** DELETE /:id — deletes a source, refusing if it has ingested news (deactivate instead). */
 router.delete('/:id', async (req, res) => {
   const newsCount = await prisma.news.count({ where: { sourceId: req.params.id } });
   if (newsCount > 0) {

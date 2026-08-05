@@ -30,6 +30,7 @@ app.get('/health', (_req, res) => {
   res.status(200).send('OK');
 });
 
+/** Catch-all error handler: logs the error and returns a generic 500 so internals never leak to clients. */
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   res.status(500).json({ error: 'Internal server error' });

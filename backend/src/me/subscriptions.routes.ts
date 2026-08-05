@@ -8,6 +8,7 @@ router.use(requireAuth);
 
 const categorySelect = { id: true, name: true, slug: true } as const;
 
+/** GET / — lists the current user's active subscriptions. */
 router.get('/', async (req, res) => {
   const subscriptions = await prisma.subscription.findMany({
     where: { userId: req.user!.sub, active: true },
@@ -17,6 +18,7 @@ router.get('/', async (req, res) => {
   res.json(subscriptions);
 });
 
+/** POST / — subscribes the current user to a category (or reactivates an existing, deactivated subscription). */
 router.post('/', async (req, res) => {
   const { categoryId } = req.body ?? {};
   if (typeof categoryId !== 'string') {
@@ -38,6 +40,7 @@ router.post('/', async (req, res) => {
   }
 });
 
+/** DELETE /:categoryId — unsubscribes the current user by marking the subscription inactive (soft delete). */
 router.delete('/:categoryId', async (req, res) => {
   try {
     await prisma.subscription.update({

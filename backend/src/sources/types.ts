@@ -1,3 +1,4 @@
+/** A feed item normalized to a common shape regardless of which source adapter produced it. */
 export interface NormalizedItem {
   externalId: string;
   title: string;
@@ -18,4 +19,5 @@ export interface StreamAdapter {
   connect(sourceUrl: string, onItem: (item: NormalizedItem) => void): () => void;
 }
 
+/** Any adapter that can supply items for a {@link Source}, whether polled or streamed. */
 export type SourceAdapter = PollAdapter | StreamAdapter;

@@ -9,6 +9,7 @@ import { SubscriptionsService } from '../subscriptions.service';
   templateUrl: './categories-page.html',
   styleUrl: './categories-page.css',
 })
+/** Lets the current user browse categories and toggle their subscriptions. */
 export class CategoriesPage implements OnInit {
   private readonly categoriesService = inject(CategoriesService);
   private readonly subscriptionsService = inject(SubscriptionsService);
@@ -18,6 +19,7 @@ export class CategoriesPage implements OnInit {
   protected readonly pendingIds = signal<Set<string>>(new Set());
   protected readonly loading = signal(true);
 
+  /** Loads all categories and the user's current subscriptions in parallel. */
   ngOnInit(): void {
     forkJoin({
       categories: this.categoriesService.list(),
@@ -32,6 +34,7 @@ export class CategoriesPage implements OnInit {
     });
   }
 
+  /** Subscribes or unsubscribes from a category, optimistically updating `subscribedIds` on success. */
   toggle(categoryId: string): void {
     const isSubscribed = this.subscribedIds().has(categoryId);
     this.setPending(categoryId, true);
@@ -55,6 +58,7 @@ export class CategoriesPage implements OnInit {
     }
   }
 
+  /** Adds/removes a category id from the in-flight `pendingIds` set, used to disable its toggle while a request is outstanding. */
   private setPending(categoryId: string, pending: boolean): void {
     const ids = new Set(this.pendingIds());
     if (pending) {

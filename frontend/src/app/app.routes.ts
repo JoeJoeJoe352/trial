@@ -9,6 +9,7 @@ import { AdminCategories } from './admin/admin-categories/admin-categories';
 import { AdminSources } from './admin/admin-sources/admin-sources';
 import { AdminUsers } from './admin/admin-users/admin-users';
 
+/** App-level route table: public pages, an auth-gated categories page, and an admin-gated /admin section. */
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'login', component: Login },

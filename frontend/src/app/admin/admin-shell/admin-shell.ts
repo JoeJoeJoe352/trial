@@ -7,4 +7,5 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.css',
 })
+/** Layout shell for the /admin section: renders the admin nav and the active child route. */
 export class AdminShell {}

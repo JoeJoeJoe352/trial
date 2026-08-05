@@ -9,6 +9,7 @@ import { slugify } from '../../shared/slugify';
   imports: [ReactiveFormsModule],
   templateUrl: './admin-categories.html',
 })
+/** Admin CRUD page for news categories: list, create, edit, and delete. */
 export class AdminCategories implements OnInit {
   private readonly service = inject(AdminCategoriesService);
   private readonly fb = inject(FormBuilder);
@@ -26,10 +27,12 @@ export class AdminCategories implements OnInit {
     this.refresh();
   }
 
+  /** Reloads the category list from the backend. */
   refresh(): void {
     this.service.list().subscribe((categories) => this.categories.set(categories));
   }
 
+  /** Populates the form with an existing category's values and switches into edit mode. */
   startEdit(category: AdminCategory): void {
     this.editingId.set(category.id);
     this.form.setValue({
@@ -38,11 +41,13 @@ export class AdminCategories implements OnInit {
     });
   }
 
+  /** Exits edit mode and resets the form to its blank state. */
   cancelEdit(): void {
     this.editingId.set(null);
     this.form.reset({ name: '', slackWebhookUrl: '' });
   }
 
+  /** Validates the form, then creates or updates the category (slug derived from name via {@link slugify}). */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -64,6 +69,7 @@ export class AdminCategories implements OnInit {
     });
   }
 
+  /** Deletes a category and refreshes the list. */
   remove(id: string): void {
     this.errorMessage.set('');
     this.service.remove(id).subscribe({

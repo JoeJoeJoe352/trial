@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
+/** The authenticated user as returned by the backend's `/api/auth/*` endpoints. */
 export interface AuthUser {
   id: string;
   email: string;
@@ -9,6 +10,7 @@ export interface AuthUser {
   role: 'ADMIN' | 'USER';
 }
 
+/** Holds session state (`currentUser`, `checked`) and wraps the auth API endpoints. */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -26,24 +28,28 @@ export class AuthService {
     });
   }
 
+  /** Registers a new account, and on success signs them in by updating `currentUser`. */
   register(email: string, name: string, password: string): Observable<AuthUser> {
     return this.http
       .post<AuthUser>('/api/auth/register', { email, name, password })
       .pipe(tap((user) => this.currentUser.set(user)));
   }
 
+  /** Logs in with email/password, and on success updates `currentUser`. */
   login(email: string, password: string): Observable<AuthUser> {
     return this.http
       .post<AuthUser>('/api/auth/login', { email, password })
       .pipe(tap((user) => this.currentUser.set(user)));
   }
 
+  /** Clears the auth cookie server-side and resets `currentUser` to null. */
   logout(): Observable<void> {
     return this.http
       .post<void>('/api/auth/logout', {})
       .pipe(tap(() => this.currentUser.set(null)));
   }
 
+  /** Fetches the current user from the backend and updates `currentUser`. */
   fetchMe(): Observable<AuthUser> {
     return this.http
       .get<AuthUser>('/api/auth/me')

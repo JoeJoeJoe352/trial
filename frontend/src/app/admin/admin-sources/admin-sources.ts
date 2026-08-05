@@ -9,6 +9,7 @@ import { CategoriesService, Category } from '../../categories/categories.service
   imports: [ReactiveFormsModule],
   templateUrl: './admin-sources.html',
 })
+/** Admin CRUD page for news sources: list, create, edit, and delete, each assigned to a category. */
 export class AdminSources implements OnInit {
   private readonly service = inject(AdminSourcesService);
   private readonly categoriesService = inject(CategoriesService);
@@ -28,19 +29,23 @@ export class AdminSources implements OnInit {
     active: [true],
   });
 
+  /** Loads sources and the categories used to populate the form's category dropdown. */
   ngOnInit(): void {
     this.refresh();
     this.categoriesService.list().subscribe((categories) => this.categories.set(categories));
   }
 
+  /** Reloads the source list from the backend. */
   refresh(): void {
     this.service.list().subscribe((sources) => this.sources.set(sources));
   }
 
+  /** Resolves a category id to its display name, falling back to the raw id if not found. */
   categoryName(categoryId: string): string {
     return this.categories().find((c) => c.id === categoryId)?.name ?? categoryId;
   }
 
+  /** Populates the form with an existing source's values and switches into edit mode. */
   startEdit(source: AdminSource): void {
     this.editingId.set(source.id);
     this.form.setValue({
@@ -53,11 +58,13 @@ export class AdminSources implements OnInit {
     });
   }
 
+  /** Exits edit mode and resets the form to its default values. */
   cancelEdit(): void {
     this.editingId.set(null);
     this.form.reset({ name: '', url: '', type: 'RSS', categoryId: '', pollIntervalSeconds: 300, active: true });
   }
 
+  /** Validates the form, then creates or updates the source. */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -78,6 +85,7 @@ export class AdminSources implements OnInit {
     });
   }
 
+  /** Deletes a source and refreshes the list. */
   remove(id: string): void {
     this.errorMessage.set('');
     this.service.remove(id).subscribe({

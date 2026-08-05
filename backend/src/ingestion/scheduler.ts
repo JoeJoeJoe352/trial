@@ -5,6 +5,7 @@ import { ingestItem } from './ingest';
 
 const timers = new Map<string, NodeJS.Timeout>();
 
+/** Fetches new items for one source via its adapter and ingests each. No-ops if the source is inactive or has no adapter. */
 async function pollSource(sourceId: string): Promise<void> {
   const source = await prisma.source.findUnique({ where: { id: sourceId } });
   if (!source || !source.active) return;
@@ -50,6 +51,7 @@ export function unschedulePolling(sourceId: string): void {
   }
 }
 
+/** Loads all active sources from the DB and schedules polling for each. Call once at server startup. */
 export async function startScheduler(): Promise<void> {
   const sources = await prisma.source.findMany({ where: { active: true } });
   for (const source of sources) {

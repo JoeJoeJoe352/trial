@@ -3,6 +3,7 @@ import { prisma } from '../db';
 import { NormalizedItem } from '../sources/types';
 import { publishNewsCreated } from './bus';
 
+/** Stores a normalized feed item as a `News` row and publishes {@link NEWS_CREATED_EVENT} for it; a duplicate (source, externalId) pair is silently ignored. */
 export async function ingestItem(source: Source, item: NormalizedItem): Promise<void> {
   try {
     const news = await prisma.news.create({

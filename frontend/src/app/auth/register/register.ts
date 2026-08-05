@@ -9,6 +9,7 @@ import { AuthService } from '../auth.service';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
 })
+/** Registration page: name/email/password form that creates an account via {@link AuthService} and redirects home on success. */
 export class Register {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
@@ -23,6 +24,7 @@ export class Register {
   protected readonly errorMessage = signal('');
   protected readonly submitting = signal(false);
 
+  /** Validates the form, then registers and navigates home, or shows an error on failure. */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

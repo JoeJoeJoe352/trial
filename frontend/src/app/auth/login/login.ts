@@ -9,6 +9,7 @@ import { AuthService } from '../auth.service';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
 })
+/** Login page: email/password form that authenticates via {@link AuthService} and redirects home on success. */
 export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
@@ -22,6 +23,7 @@ export class Login {
   protected readonly errorMessage = signal('');
   protected readonly submitting = signal(false);
 
+  /** Validates the form, then logs in and navigates home, or shows an error on failure. */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -36,10 +38,8 @@ export class Login {
       next: () => {
         this.submitting.set(false);
         this.router.navigateByUrl('/');
-        console.log("11111")
       },
       error: (err: HttpErrorResponse) => {
-        console.log("22222")
         this.submitting.set(false);
         this.errorMessage.set(err.status === 401 ? 'Invalid email or password' : 'Something went wrong');
       },

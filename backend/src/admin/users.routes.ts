@@ -8,11 +8,13 @@ import { toPublicUser } from '../auth/public-user';
 const router = Router();
 const VALID_ROLES: Role[] = ['ADMIN', 'USER'];
 
+/** GET / — lists all users (public-safe fields only). */
 router.get('/', async (_req, res) => {
   const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
   res.json(users.map(toPublicUser));
 });
 
+/** GET /:id — fetches one user by id. */
 router.get('/:id', async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.params.id } });
   if (!user) {
@@ -22,6 +24,7 @@ router.get('/:id', async (req, res) => {
   res.json(toPublicUser(user));
 });
 
+/** POST / — creates a user (admin can set role directly, unlike self-registration). */
 router.post('/', async (req, res) => {
   const { email, name, password, role } = req.body ?? {};
 
@@ -51,6 +54,7 @@ router.post('/', async (req, res) => {
   }
 });
 
+/** PATCH /:id — partially updates a user, re-hashing the password if one is provided. */
 router.patch('/:id', async (req, res) => {
   const { email, name, password, role } = req.body ?? {};
 
@@ -78,6 +82,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+/** DELETE /:id — deletes a user, refusing self-deletion. */
 router.delete('/:id', async (req, res) => {
   if (req.user?.sub === req.params.id) {
     res.status(400).json({ error: 'Cannot delete your own account' });

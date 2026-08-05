@@ -8,6 +8,7 @@ import { AdminUsersService, AdminUser, UserRole } from '../admin-users.service';
   imports: [ReactiveFormsModule],
   templateUrl: './admin-users.html',
 })
+/** Admin CRUD page for users: list, create, edit (including role/password), and delete. */
 export class AdminUsers implements OnInit {
   private readonly service = inject(AdminUsersService);
   private readonly fb = inject(FormBuilder);
@@ -27,20 +28,24 @@ export class AdminUsers implements OnInit {
     this.refresh();
   }
 
+  /** Reloads the user list from the backend. */
   refresh(): void {
     this.service.list().subscribe((users) => this.users.set(users));
   }
 
+  /** Populates the form with an existing user's values (password left blank) and switches into edit mode. */
   startEdit(user: AdminUser): void {
     this.editingId.set(user.id);
     this.form.setValue({ name: user.name, email: user.email, password: '', role: user.role });
   }
 
+  /** Exits edit mode and resets the form to its blank state. */
   cancelEdit(): void {
     this.editingId.set(null);
     this.form.reset({ name: '', email: '', password: '', role: 'USER' });
   }
 
+  /** Validates the form, then creates a user (password required) or updates one (password sent only if changed). */
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -69,6 +74,7 @@ export class AdminUsers implements OnInit {
     });
   }
 
+  /** Deletes a user and refreshes the list. */
   remove(id: string): void {
     this.errorMessage.set('');
     this.service.remove(id).subscribe({

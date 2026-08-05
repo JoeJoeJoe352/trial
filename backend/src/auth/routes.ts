@@ -8,6 +8,7 @@ import { toPublicUser } from './public-user';
 
 const router = Router();
 
+/** POST /register — creates a user and logs them in by setting the auth cookie. */
 router.post('/register', async (req, res) => {
   const { email, name, password } = req.body ?? {};
 
@@ -36,6 +37,7 @@ router.post('/register', async (req, res) => {
   res.status(201).json(toPublicUser(user));
 });
 
+/** POST /login — verifies credentials and sets the auth cookie. */
 router.post('/login', async (req, res) => {
   const { email, password } = req.body ?? {};
 
@@ -55,11 +57,13 @@ router.post('/login', async (req, res) => {
   res.json(toPublicUser(user));
 });
 
+/** POST /logout — clears the auth cookie. */
 router.post('/logout', (_req, res) => {
   res.clearCookie(AUTH_COOKIE_NAME, { ...authCookieOptions, maxAge: undefined });
   res.status(204).send();
 });
 
+/** GET /me — returns the current authenticated user. */
 router.get('/me', requireAuth, async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.user!.sub } });
   if (!user) {
