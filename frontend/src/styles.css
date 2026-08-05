@@ -90,11 +90,20 @@ body {
   border-radius: 4px;
 }
 
-.inline-form label.checkbox {
+.inline-form label {
   display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.inline-form label.checkbox {
+  flex-direction: row;
   align-items: center;
   gap: 0.3rem;
   font-size: 0.9rem;
+  color: inherit;
 }
 
 .inline-form button {

@@ -2,8 +2,15 @@
   <h2>Categories</h2>
 
   <form class="inline-form" [formGroup]="form" (ngSubmit)="submit()">
-    <input type="text" formControlName="name" placeholder="Name" />
-    <input type="text" formControlName="slackWebhookUrl" placeholder="Slack webhook URL (optional)" />
+    <label>
+      Name
+      <input type="text" formControlName="name" />
+    </label>
+
+    <label>
+      Slack webhook URL (optional)
+      <input type="text" formControlName="slackWebhookUrl" />
+    </label>
     <button type="submit">{{ editingId() ? 'Save' : 'Add' }}</button>
     @if (editingId()) {
       <button type="button" class="secondary" (click)="cancelEdit()">Cancel</button>

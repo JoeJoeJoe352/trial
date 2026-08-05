@@ -2,14 +2,28 @@
   <h2>Users</h2>
 
   <form class="inline-form" [formGroup]="form" (ngSubmit)="submit()">
-    <input type="text" formControlName="name" placeholder="Name" />
-    <input type="email" formControlName="email" placeholder="Email" />
-    <input type="password" formControlName="password" [placeholder]="editingId() ? 'New password (optional)' : 'Password'" />
+    <label>
+      Name
+      <input type="text" formControlName="name" />
+    </label>
 
-    <select formControlName="role">
-      <option value="USER">USER</option>
-      <option value="ADMIN">ADMIN</option>
-    </select>
+    <label>
+      Email
+      <input type="email" formControlName="email" />
+    </label>
+
+    <label>
+      {{ editingId() ? 'New password (optional)' : 'Password' }}
+      <input type="password" formControlName="password" />
+    </label>
+
+    <label>
+      Role
+      <select formControlName="role">
+        <option value="USER">USER</option>
+        <option value="ADMIN">ADMIN</option>
+      </select>
+    </label>
 
     <button type="submit">{{ editingId() ? 'Save' : 'Add' }}</button>
     @if (editingId()) {

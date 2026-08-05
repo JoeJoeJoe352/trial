@@ -2,22 +2,38 @@
   <h2>Sources</h2>
 
   <form class="inline-form" [formGroup]="form" (ngSubmit)="submit()">
-    <input type="text" formControlName="name" placeholder="Name" />
-    <input type="text" formControlName="url" placeholder="Feed URL" />
+    <label>
+      Name
+      <input type="text" formControlName="name" />
+    </label>
 
-    <select formControlName="type">
-      <option value="RSS">RSS</option>
-      <option value="WEBSOCKET">WEBSOCKET</option>
-    </select>
+    <label>
+      Feed URL
+      <input type="text" formControlName="url" />
+    </label>
 
-    <select formControlName="categoryId">
-      <option value="" disabled>Category...</option>
-      @for (category of categories(); track category.id) {
-        <option [value]="category.id">{{ category.name }}</option>
-      }
-    </select>
+    <label>
+      Type
+      <select formControlName="type">
+        <option value="RSS">RSS</option>
+        <option value="WEBSOCKET">WEBSOCKET</option>
+      </select>
+    </label>
 
-    <input type="number" formControlName="pollIntervalSeconds" placeholder="Poll interval (s)" />
+    <label>
+      Category
+      <select formControlName="categoryId">
+        <option value="" disabled>Category...</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Poll interval (s)
+      <input type="number" formControlName="pollIntervalSeconds" />
+    </label>
 
     <label class="checkbox">
       <input type="checkbox" formControlName="active" />
