@@ -8,16 +8,16 @@ import { toPublicUser } from '../auth/public-user';
 const router = Router();
 const VALID_ROLES: Role[] = ['ADMIN', 'USER'];
 
-/** GET / — lists all users (public-safe fields only). */
+/** GET / — lists all non-deleted users (public-safe fields only). */
 router.get('/', async (_req, res) => {
-  const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
+  const users = await prisma.user.findMany({ where: { deletedAt: null }, orderBy: { createdAt: 'desc' } });
   res.json(users.map(toPublicUser));
 });
 
-/** GET /:id — fetches one user by id. */
+/** GET /:id — fetches one non-deleted user by id. */
 router.get('/:id', async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.params.id } });
-  if (!user) {
+  if (!user || user.deletedAt) {
     res.status(404).json({ error: 'User not found' });
     return;
   }
@@ -74,6 +74,11 @@ router.patch('/:id', async (req, res) => {
   if (password !== undefined) data.passwordHash = await bcrypt.hash(password, 10);
 
   try {
+    const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!existing || existing.deletedAt) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
     const user = await prisma.user.update({ where: { id: req.params.id }, data });
     res.json(toPublicUser(user));
   } catch (err) {
@@ -82,7 +87,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-/** DELETE /:id — deletes a user, refusing self-deletion. */
+/** DELETE /:id — soft-deletes a user (sets `deletedAt`, revokes their sessions) and refuses self-deletion. */
 router.delete('/:id', async (req, res) => {
   if (req.user?.sub === req.params.id) {
     res.status(400).json({ error: 'Cannot delete your own account' });
@@ -90,7 +95,11 @@ router.delete('/:id', async (req, res) => {
   }
 
   try {
-    await prisma.user.delete({ where: { id: req.params.id } });
+    const user = await prisma.user.update({
+      where: { id: req.params.id },
+      data: { deletedAt: new Date() },
+    });
+    await prisma.session.deleteMany({ where: { userId: user.id } });
     res.status(204).send();
   } catch (err) {
     if (handlePrismaError(err, res)) return;

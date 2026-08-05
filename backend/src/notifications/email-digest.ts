@@ -30,7 +30,7 @@ export async function flushDueEmailDigests(): Promise<void> {
 /** Sends one user's queued items as a single digest, if their cooldown since the last email has elapsed. Leaves items PENDING (for retry) if the user isn't eligible yet or the send fails. */
 async function flushUserDigest(userId: string): Promise<void> {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user || Date.now() - user.lastEmailSentAt.getTime() < COOLDOWN_MS) return;
+  if (!user || user.deletedAt || Date.now() - user.lastEmailSentAt.getTime() < COOLDOWN_MS) return;
 
   const deliveries = await prisma.delivery.findMany({
     where: { channel: 'EMAIL', status: 'PENDING', userId },

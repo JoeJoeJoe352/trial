@@ -15,7 +15,7 @@ async function handleNewsCreated({ news, categoryId }: NewsCreatedEvent): Promis
   if (!category) return;
 
   const subscriptions = await prisma.subscription.findMany({
-    where: { categoryId, active: true },
+    where: { categoryId, active: true, user: { deletedAt: null } },
     include: { user: { select: { id: true, email: true } } },
   });
 
