@@ -100,10 +100,10 @@ model Subscription {
   createdAt DateTime @default(now())
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([userId, categoryId])
   @@map("subscriptions")
@@ -122,11 +122,11 @@ model Delivery {
 
   // Set for EMAIL deliveries (one per subscribed user)
   userId String?
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   // Set for SLACK deliveries (one broadcast per category)
   categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@unique([newsId, channel, userId])
   @@unique([newsId, channel, categoryId])

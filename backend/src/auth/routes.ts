@@ -4,6 +4,7 @@ import { prisma } from '../db';
 import { signToken } from './jwt';
 import { AUTH_COOKIE_NAME, authCookieOptions } from './cookie';
 import { requireAuth } from './middleware';
+import { toPublicUser } from './public-user';
 
 const router = Router();
 
@@ -32,7 +33,7 @@ router.post('/register', async (req, res) => {
 
   const token = signToken({ sub: user.id, role: user.role });
   res.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
-  res.status(201).json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.status(201).json(toPublicUser(user));
 });
 
 router.post('/login', async (req, res) => {
@@ -51,7 +52,7 @@ router.post('/login', async (req, res) => {
 
   const token = signToken({ sub: user.id, role: user.role });
   res.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.json(toPublicUser(user));
 });
 
 router.post('/logout', (_req, res) => {
@@ -65,7 +66,7 @@ router.get('/me', requireAuth, async (req, res) => {
     res.status(404).json({ error: 'User not found' });
     return;
   }
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.json(toPublicUser(user));
 });
 
 export default router;

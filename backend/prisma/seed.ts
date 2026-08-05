@@ -1,9 +1,13 @@
 import 'dotenv/config';
+import bcrypt from 'bcryptjs';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
+
+const ADMIN_EMAIL = 'admin@example.com';
+const ADMIN_PASSWORD = 'adminadmin';
 
 const categories = [
   { name: 'Markets', slug: 'markets' },
@@ -53,6 +57,19 @@ async function main() {
         categoryId: categoryIdBySlug[source.categorySlug],
       },
     });
+  }
+
+  const existingAdmin = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+  if (!existingAdmin) {
+    await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        name: 'Admin',
+        passwordHash: await bcrypt.hash(ADMIN_PASSWORD, 10),
+        role: 'ADMIN',
+      },
+    });
+    console.log(`Created admin user: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
   }
 
   console.log('Seed complete.');

@@ -1,6 +1,9 @@
+import { Source } from '@prisma/client';
 import { prisma } from '../db';
 import { sourceAdapters } from '../sources/registry';
 import { ingestItem } from './ingest';
+
+const timers = new Map<string, NodeJS.Timeout>();
 
 async function pollSource(sourceId: string): Promise<void> {
   const source = await prisma.source.findUnique({ where: { id: sourceId } });
@@ -22,16 +25,35 @@ async function pollSource(sourceId: string): Promise<void> {
   }
 }
 
-export async function startScheduler(): Promise<void> {
-  const sources = await prisma.source.findMany({ where: { active: true } });
+/** (Re)schedules polling for a source based on its current active/type/interval. Call after any create/update. */
+export function schedulePolling(source: Source): void {
+  unschedulePolling(source.id);
+  if (!source.active) return;
 
-  for (const source of sources) {
-    if (sourceAdapters[source.type]?.kind !== 'poll') continue;
-
-    // Poll once immediately, then keep polling on the source's configured interval.
-    void pollSource(source.id);
-    setInterval(() => void pollSource(source.id), source.pollIntervalSeconds * 1000);
+  const adapter = sourceAdapters[source.type];
+  if (!adapter || adapter.kind !== 'poll') {
+    console.warn(`No poll adapter registered for source type "${source.type}" (source: ${source.name})`);
+    return;
   }
 
+  void pollSource(source.id);
+  const timer = setInterval(() => void pollSource(source.id), source.pollIntervalSeconds * 1000);
+  timers.set(source.id, timer);
+}
+
+/** Stops polling a source. Call after deactivating or deleting it. */
+export function unschedulePolling(sourceId: string): void {
+  const timer = timers.get(sourceId);
+  if (timer) {
+    clearInterval(timer);
+    timers.delete(sourceId);
+  }
+}
+
+export async function startScheduler(): Promise<void> {
+  const sources = await prisma.source.findMany({ where: { active: true } });
+  for (const source of sources) {
+    schedulePolling(source);
+  }
   console.log(`Scheduler started for ${sources.length} active source(s).`);
 }
