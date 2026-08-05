@@ -1,6 +1,10 @@
 <main class="page">
   <h1>Categories</h1>
 
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
   @if (loading()) {
     <p>Loading...</p>
   } @else {

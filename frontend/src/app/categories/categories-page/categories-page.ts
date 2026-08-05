@@ -18,6 +18,7 @@ export class CategoriesPage implements OnInit {
   protected readonly subscribedIds = signal<Set<string>>(new Set());
   protected readonly pendingIds = signal<Set<string>>(new Set());
   protected readonly loading = signal(true);
+  protected readonly errorMessage = signal('');
 
   /** Loads all categories and the user's current subscriptions in parallel. */
   ngOnInit(): void {
@@ -30,7 +31,10 @@ export class CategoriesPage implements OnInit {
         this.subscribedIds.set(new Set(subscriptions.map((s) => s.category.id)));
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.loading.set(false);
+        this.errorMessage.set('Failed to load categories. Please try refreshing the page.');
+      },
     });
   }
 
@@ -38,6 +42,7 @@ export class CategoriesPage implements OnInit {
   toggle(categoryId: string): void {
     const isSubscribed = this.subscribedIds().has(categoryId);
     this.setPending(categoryId, true);
+    this.errorMessage.set('');
 
     const onSuccess = () => {
       const ids = new Set(this.subscribedIds());
@@ -49,7 +54,12 @@ export class CategoriesPage implements OnInit {
       this.subscribedIds.set(ids);
       this.setPending(categoryId, false);
     };
-    const onError = () => this.setPending(categoryId, false);
+    const onError = () => {
+      this.setPending(categoryId, false);
+      this.errorMessage.set(
+        isSubscribed ? 'Failed to unsubscribe. Please try again.' : 'Failed to subscribe. Please try again.',
+      );
+    };
 
     if (isSubscribed) {
       this.subscriptionsService.unsubscribe(categoryId).subscribe({ next: onSuccess, error: onError });
