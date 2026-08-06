@@ -39,3 +39,5 @@
 "let's simulate the slack sending. Create a file for every category and update them with the news"
 "keep the original behavior too"
 "do the same with the email sending. Preserve the original behavior too"
+"write some tests for the dispatch service"
+"it doesn't look like the slack-simulated files are updating. There is 3 piece of news at the dowjones since the last update"
