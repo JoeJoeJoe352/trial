@@ -41,3 +41,17 @@
 "do the same with the email sending. Preserve the original behavior too"
 "write some tests for the dispatch service"
 "it doesn't look like the slack-simulated files are updating. There is 3 piece of news at the dowjones since the last update"
+"check the feeds.content.dowjones.io/public/rss/mw_topstories and see for yourself"
+"no, you are right. What about this?
+<item>
+<guid isPermaLink="false">WP-MKTW-0005161373</guid>
+<title>‘I don’t wish to be cold-hearted’: My elderly relative can no longer care for himself. Am I wrong to leave his care to the state?</title>
+<description>“He has never been particularly generous or nurturing.”</description>
+<link>https://www.marketwatch.com/story/i-dont-wish-to-be-cold-hearted-my-elderly-relative-can-no-longer-care-for-himself-am-i-wrong-to-leave-his-care-to-the-state-8d546b32?mod=mw_rss_topstories</link>
+<pubDate>Thu, 06 Aug 2026 01:31:00 GMT</pubDate>
+<dc:creator>Quentin Fottrell</dc:creator>
+<media:content url="https://images.mktw.net/im-96138603" medium="image" type="image/jpeg">
+<media:credit>Getty Images</media:credit>
+</media:content>
+</item>
+This is the last piace of news. Why it doesn't exist in the file?"
