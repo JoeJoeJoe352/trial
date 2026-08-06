@@ -8,11 +8,9 @@ interface SubscribedUser {
   email: string;
 }
 
-/** Fans a news item out to the category's Slack webhook (if set, immediately) and queues an email delivery for every subscribed user. */
+/** Fans a news item out to the category's (simulated) Slack channel and queues an email delivery for every subscribed user. */
 export async function dispatchNewsToChannels(news: News, category: Category, users: SubscribedUser[]): Promise<void> {
-  if (category.slackWebhookUrl) {
-    await sendSlackAndRecord(news, category);
-  }
+  await sendSlackAndRecord(news, category);
 
   for (const user of users) {
     await enqueueEmail(news, user.id);
@@ -34,7 +32,7 @@ async function enqueueEmail(news: News, userId: string): Promise<void> {
   }
 }
 
-/** Sends the news item to the category's Slack webhook immediately and records the attempt in `Delivery`, deduping on (news, category). */
+/** Sends the news item to the category's (simulated) Slack channel immediately and records the attempt in `Delivery`, deduping on (news, category). */
 async function sendSlackAndRecord(news: News, category: Category): Promise<void> {
   let status: DeliveryStatus = 'SENT';
   let error: string | undefined;
@@ -42,8 +40,9 @@ async function sendSlackAndRecord(news: News, category: Category): Promise<void>
   try {
     await notificationChannels.SLACK.send({
       news,
-      destination: category.slackWebhookUrl!,
+      destination: category.slackWebhookUrl ?? '',
       categoryName: category.name,
+      categorySlug: category.slug,
     });
   } catch (err) {
     status = 'FAILED';

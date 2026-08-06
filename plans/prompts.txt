@@ -1,9 +1,6 @@
 "create a new project. Nodejs-typescript backend and angular frontend. Let it be docker containerised. The goal is when I start the container, and write localhost in my browser, open a hello world page"
-[Request interrupted by user for tool use]
 "create a gitignore file and ignore all folders which are not usually store in repo"
-[Request interrupted by user for tool use]
 "this is the context. Don't do anything just read it and help me to plan: 'We want users to be able to set up alerts so they get notified when something important happens in the world — like breaking news, market movements, natural disasters, that kind of thing. Should work for both email and Slack. Make it flexible enough that we can add more channels later. We need an admin view too.'"
-[Request interrupted by user for tool use]
 "what is your opinion about collecting news data from rss feeds?"
 "market movement news should come from here: https://feeds.content.dowjones.io/public/rss/mw_topstories / disaster news should come from here: https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/topic/organization/federal-emergency-management-agency/rss.xml / and breaking news from here: https://rss.nytimes.com/services/xml/rss/nyt/World.xml / but the structure should support another sources and another formats (like websocket)"
 "it is a 1:1 relation. 1, yes it's extend the current sonrisa 2 repo. 2, admin view: rss feed crud, user crud, category crud (category is a different table). Also need a database to store older news, users, categories, sources and user subscriptions"
@@ -16,7 +13,7 @@
 "create forms for registration/login. I want to check these implementation myself"
 "create a header and show the register and login buttons when the user is not authenticated. If he or she is, show the logout button"
 "install wite to rebuild frontend files on change"
-(selecting protected errorMessage = ''; protected submitting = false; in login.ts) "these are not signals so even if they change the component won't change. So if I try to login with wrong data, there isn't any error message"
+"these are not signals so even if they change the component won't change. So if I try to login with wrong data, there isn't any error message"
 "execute phase 3"
 "okay, execute phase 2"
 "please execute phase six now, so I can test the current workflow"
@@ -37,3 +34,8 @@
 "One mail per news item is too often. Let's wait 15 minutes between email/users. Make a plan how would you implement it"
 "yes, implement it please"
 "okay test it please"
+"please implement soft deletion for user and change hard deletes. Also implement server side logout (delete the server side cookie)"
+"how can I improve this app? Let's brainstorm!"
+"let's simulate the slack sending. Create a file for every category and update them with the news"
+"keep the original behavior too"
+"do the same with the email sending. Preserve the original behavior too"

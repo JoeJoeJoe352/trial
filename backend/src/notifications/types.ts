@@ -6,6 +6,7 @@ export interface NotificationPayload {
   /** An email address for EMAIL, a webhook URL for SLACK. */
   destination: string;
   categoryName: string;
+  categorySlug: string;
 }
 
 /** A delivery mechanism (email, Slack, ...) that knows how to send a single {@link NotificationPayload}. */
